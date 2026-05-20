@@ -16,8 +16,8 @@ export const getDesignBaseMode = (designBase?: string): DesignBaseMode => {
   const normalized = designBase?.trim().toLowerCase()
 
   return normalized
-    ? DESIGN_BASE_DEVICE_ALIASES[normalized as keyof typeof DESIGN_BASE_DEVICE_ALIASES] || 'mobile'
-    : 'mobile'
+    ? DESIGN_BASE_DEVICE_ALIASES[normalized as keyof typeof DESIGN_BASE_DEVICE_ALIASES] || 'all'
+    : 'all'
 }
 
 export const getDesignBaseDevice = (designBase?: string) => {
