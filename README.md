@@ -3,11 +3,9 @@
 “容器项目”，负责画布、设备框、页面说明和跳转关系展示。
 
 ## 运行方式
-原型页面目录要在在启动开发服务器或编译时通过 `PROTOTYPE_PAGES_DIR` 动态指定：
-
+原型页面目录要在在启动开发服务器或编译时通过 `PROTOTYPE_PAGES_DIR` 动态指定，比如：
 ```bash
 PROTOTYPE_PAGES_DIR=../OtherPrototype/src/pages npm run dev
-PROTOTYPE_PAGES_DIR=/absolute/path/to/pages npm run build
 ```
 
 ## 目录说明
