@@ -151,7 +151,7 @@ const resolveDocApiReferences = (doc: string, apis: PageApi[]) => {
     const apiName = escapeMarkdownLinkText(api?.name || apiId)
 
     if (api?.docUrl) {
-      return `【${apiName}](${api.docUrl})】`
+      return `【[${apiName}](${api.docUrl})】`
     }
 
     return `【**接口文档地址未配置：${apiName}**】`
