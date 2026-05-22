@@ -158,15 +158,13 @@ export const parseApis = (rawContent: string): PageApi[] => {
       const apiBlock = match[1]
       const id = getTagContent(apiBlock, 'id') || `api-${index + 1}`
       const name = getTagContent(apiBlock, 'name') || id
-      const url = getTagContent(apiBlock, 'url')
-      const description = getTagContent(apiBlock, 'description')
+      const path = getTagContent(apiBlock, 'path')
 
       return {
         id,
         name,
-        url,
-        description,
-        descriptionHtml: renderMarkdown(description || '暂无接口说明'),
+        path,
+        docUrl: '',
       }
     })
     .filter((api) => api.id || api.name)

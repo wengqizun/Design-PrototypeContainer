@@ -5,6 +5,7 @@ import path from 'node:path'
 
 const stripAnsi = (value) => value.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
 const resolvePath = (value) => path.resolve(process.cwd(), value)
+const OPENAPI_HOST = '127.0.0.1'
 const OPENAPI_DEFAULT_PORT = 9910
 
 const usage = [
@@ -121,7 +122,7 @@ const watchChildExit = (child) => {
 process.on('SIGINT', () => shutdown(0))
 process.on('SIGTERM', () => shutdown(0))
 
-const isPortAvailable = (port) => new Promise((resolve) => {
+const isPortAvailable = (port, host = OPENAPI_HOST) => new Promise((resolve) => {
   const server = net.createServer()
 
   server.once('error', () => resolve(false))
@@ -129,8 +130,18 @@ const isPortAvailable = (port) => new Promise((resolve) => {
     server.close(() => resolve(true))
   })
 
-  server.listen(port)
+  server.listen(port, host)
 })
+
+const findAvailablePort = async (startPort) => {
+  let port = startPort
+
+  while (!(await isPortAvailable(port))) {
+    port += 1
+  }
+
+  return port
+}
 
 const startPrototype = (prototypeDir) => new Promise((resolve, reject) => {
   const child = spawn('npm', ['--prefix', prototypeDir, 'run', 'dev'], {
@@ -169,11 +180,8 @@ const startPrototype = (prototypeDir) => new Promise((resolve, reject) => {
 })
 
 const startOpenApi = async (openapiDir) => {
-  const port = OPENAPI_DEFAULT_PORT
-
-  if (!(await isPortAvailable(port))) {
-    throw new Error(`OpenAPI preview 端口 ${port} 已被占用`)
-  }
+  const port = await findAvailablePort(OPENAPI_DEFAULT_PORT)
+  const server = `http://${OPENAPI_HOST}:${port}`
 
   const child = spawn('npx', ['@redocly/cli', 'preview', '-p', String(port)], {
     cwd: openapiDir,
@@ -187,15 +195,18 @@ const startOpenApi = async (openapiDir) => {
     shutdown(1)
   })
 
-  console.log(`OpenAPI preview: http://localhost:${port}`)
+  console.log(`OpenAPI preview: ${server}`)
+
+  return server
 }
 
-const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir }) => {
+const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir, openApiServer }) => {
   const child = spawn('npm', ['--prefix', containerDir, 'run', 'dev'], {
     stdio: 'inherit',
     env: {
       ...process.env,
       VITE_PROTOTYPE_ORIGIN: prototypeOrigin,
+      VITE_REDOCLY_CLI_SERVER: openApiServer || '',
       PROTOTYPE_PAGES_DIR: prototypePagesDir,
     },
   })
@@ -207,11 +218,12 @@ const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir }) =>
 try {
   const { containerDir, prototypeDir, openapiDir } = parseArgs(process.argv.slice(2))
   const prototypePagesDir = path.join(prototypeDir, 'src/pages')
+  let openApiServer = ''
   if (openapiDir) {
-    await startOpenApi(openapiDir)
+    openApiServer = await startOpenApi(openapiDir)
   }
   const prototypeOrigin = await startPrototype(prototypeDir)
-  startContainer({ containerDir, prototypeOrigin, prototypePagesDir })
+  startContainer({ containerDir, prototypeOrigin, prototypePagesDir, openApiServer })
 } catch (error) {
   console.error(error)
   shutdown(1)

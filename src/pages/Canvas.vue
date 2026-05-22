@@ -26,7 +26,6 @@ const edges = ref<Edge[]>([])
 const selectedPageId = ref<string | null>(null)
 const showRelatedLines = ref(false)
 const activeDocPageId = ref<string | null>(null)
-const activeApiDescriptionKey = ref<string | null>(null)
 const activeJumpLineKey = ref<string | null>(null)
 const copiedPageId = ref<string | null>(null)
 let copyFeedbackTimer: number | null = null
@@ -139,16 +138,23 @@ const escapeMarkdownLinkText = (value: string) => {
   return value.replace(/([\\\[\]])/g, '\\$1')
 }
 
+const buildApiDocUrl = (path: string) => {
+  const server = import.meta.env.VITE_REDOCLY_CLI_SERVER
+  if (!server || !path) return ''
+
+  return new URL(path, server.endsWith('/') ? server : `${server}/`).href
+}
+
 const resolveDocApiReferences = (doc: string, apis: PageApi[]) => {
   return doc.replace(/<apis\.([A-Za-z0-9_-]+)>/g, (_, apiId: string) => {
     const api = apis.find((item) => item.id === apiId)
     const apiName = escapeMarkdownLinkText(api?.name || apiId)
 
-    if (api?.url) {
-      return `【[点我查看接口详情：${apiName}](${api.url})】`
+    if (api?.docUrl) {
+      return `【[点我查看接口详情：${apiName}](${api.docUrl})】`
     }
 
-    return `【**详见右侧接口说明：${apiName}**】`
+    return `【**接口文档地址未配置：${apiName}**】`
   })
 }
 
@@ -175,7 +181,10 @@ const loadPages = async () => {
     
     const jumps = parseJumps(rawContent).filter((jump) => jump.targetId !== name)
 
-    const apis = parseApis(rawContent)
+    const apis = parseApis(rawContent).map((api) => ({
+      ...api,
+      docUrl: buildApiDocUrl(api.path),
+    }))
     const doc = resolveDocApiReferences(getTagContent(rawContent, 'doc') || '暂无页面说明', apis)
     
     const pageSize = getPageSize()
@@ -456,7 +465,6 @@ const onMouseDown = (e: MouseEvent) => {
   const target = e.target as HTMLElement
   if (target.closest('.page-wrapper') || target.closest('.proto-btn') || target.closest('.jump-reason-btn') || target.closest('.jump-entry-marker') || target.closest('.jump-reason-popover')) return
   activeDocPageId.value = null
-  activeApiDescriptionKey.value = null
   activeJumpLineKey.value = null
   isDraggingCanvas = true
 }
@@ -523,23 +531,13 @@ const togglePageDoc = (e: MouseEvent, pageId: string) => {
   activeJumpLineKey.value = null
   const isClosing = activeDocPageId.value === pageId
   activeDocPageId.value = isClosing ? null : pageId
-  activeApiDescriptionKey.value = null
 }
 
 const toggleJumpReason = (e: MouseEvent, marker: JumpMarker) => {
   e.stopPropagation()
   selectPage(marker.edge.sourceId)
   activeDocPageId.value = null
-  activeApiDescriptionKey.value = null
   activeJumpLineKey.value = activeJumpLineKey.value === marker.key ? null : marker.key
-}
-
-const getApiKey = (pageId: string, api: PageApi) => `${pageId}:${api.id}`
-
-const toggleApiDescription = (e: MouseEvent, pageId: string, api: PageApi) => {
-  e.stopPropagation()
-  const apiKey = getApiKey(pageId, api)
-  activeApiDescriptionKey.value = activeApiDescriptionKey.value === apiKey ? null : apiKey
 }
 
 const focusPage = async (pageId: string) => {
@@ -547,7 +545,6 @@ const focusPage = async (pageId: string) => {
   if (!page) return
   selectPage(pageId)
   activeJumpLineKey.value = null
-  activeApiDescriptionKey.value = null
   await nextTick()
   onDoubleClickPage(page)
 }
@@ -598,7 +595,6 @@ const switchDevice = async (device: DeviceName) => {
     saveDevice(device)
   }
   activeDocPageId.value = null
-  activeApiDescriptionKey.value = null
   activeJumpLineKey.value = null
 
   autoPositionPages(pages.value)
@@ -765,9 +761,6 @@ const importLayout = (e: Event) => {
         <CanvasDocPanel
           v-if="activeDocPage"
           :active-doc-page="activeDocPage"
-          :active-api-description-key="activeApiDescriptionKey"
-          @toggle-api-description="toggleApiDescription"
-          @focus-page="focusPage"
         />
       </div>
     </div>

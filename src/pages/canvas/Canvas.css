@@ -511,45 +511,6 @@
   overflow-wrap: anywhere;
 }
 
-.page-api-help {
-  flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
-  border: 1px solid #d1d5db;
-  border-radius: 50%;
-  background: white;
-  color: #374151;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
-}
-
-.page-api-help:hover,
-.page-api-help[aria-expanded='true'] {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-}
-
-.page-api-help:active {
-  transform: scale(0.96);
-}
-
-.page-api-description {
-  margin-top: 8px;
-  padding: 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-sm);
-  background: #f9fafb;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
 .page-apis-empty {
   color: #6b7280;
   font-size: 13px;

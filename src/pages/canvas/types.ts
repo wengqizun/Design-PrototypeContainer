@@ -15,9 +15,8 @@ export interface PageNode {
 export interface PageApi {
   id: string
   name: string
-  url: string
-  description: string
-  descriptionHtml: string
+  path: string
+  docUrl: string
 }
 
 export interface PageJump {

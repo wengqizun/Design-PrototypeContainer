@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import type { PageApi, PageNode } from './types'
+import type { PageNode } from './types'
 
 defineProps<{
   activeDocPage: PageNode
-  activeApiDescriptionKey: string | null
 }>()
-
-defineEmits<{
-  toggleApiDescription: [event: MouseEvent, pageId: string, api: PageApi]
-  focusPage: [pageId: string]
-}>()
-
-const getApiKey = (pageId: string, api: PageApi) => `${pageId}:${api.id}`
 </script>
 
 <template>
@@ -33,9 +25,9 @@ const getApiKey = (pageId: string, api: PageApi) => `${pageId}:${api.id}`
       <div v-if="activeDocPage.apis.length" class="page-api-list">
         <div v-for="api in activeDocPage.apis" :key="api.id" class="page-api-item">
           <a
-            v-if="api.url"
+            v-if="api.docUrl"
             class="page-api-link"
-            :href="api.url"
+            :href="api.docUrl"
             target="_blank"
             rel="noreferrer"
           >
@@ -43,22 +35,7 @@ const getApiKey = (pageId: string, api: PageApi) => `${pageId}:${api.id}`
           </a>
           <div v-else class="page-api-inline">
             <span class="page-api-name">{{ api.name }}</span>
-            <button
-              class="page-api-help"
-              type="button"
-              :aria-expanded="activeApiDescriptionKey === getApiKey(activeDocPage.id, api)"
-              :aria-label="`查看 ${api.name} 的接口说明`"
-              title="查看接口说明"
-              @click="$emit('toggleApiDescription', $event, activeDocPage.id, api)"
-            >
-              ?
-            </button>
           </div>
-          <div
-            v-if="!api.url && activeApiDescriptionKey === getApiKey(activeDocPage.id, api)"
-            class="page-api-description page-doc-content"
-            v-html="api.descriptionHtml"
-          ></div>
         </div>
       </div>
       <div v-else class="page-apis-empty">暂无接口</div>

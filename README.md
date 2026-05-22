@@ -4,15 +4,13 @@
 
 ## 运行方式
 1. 只启动原型项目：
-原型页面目录要在在启动开发服务器或编译时通过 `PROTOTYPE_PAGES_DIR` 动态指定，比如：
 ```bash
-PROTOTYPE_PAGES_DIR=../OtherPrototype/src/pages npm run dev
+PROTOTYPE_PAGES_DIR=xxx VITE_REDOCLY_CLI_SERVER=xxxx npm run dev
 ```
-2. 启动所有项目（包括容器项目、原型项目、OpenAPI项目）
-- 格式：`node start-prototype.mjs --container-dir [容器项目地址] --prototype-dir [原型项目地址] --openapi-dir [OpenAPI项目地址]`
-- 示例：在当前目录运行`node start-prototype.mjs --container-dir . --prototype-dir ../Prototype --openapi-dir ../OpenAPI`
+- PROTOTYPE_PAGES_DIR：原型页面目录，用于指定原型项目的页面目录。
+- VITE_REDOCLY_CLI_SERVER：Redocly CLI服务器地址，
 
-## 目录说明
+`## 目录说明
 - `src/components`：用于存放可复用的VUE组件。
 - `src/styles`：用于存放可复用的样式和DesignToken。
 - `src/pages`：用于存放具体的VUE页面。
