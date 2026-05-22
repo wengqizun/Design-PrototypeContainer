@@ -183,7 +183,7 @@ const startOpenApi = async (openapiDir) => {
   const port = await findAvailablePort(OPENAPI_DEFAULT_PORT)
   const server = `http://${OPENAPI_HOST}:${port}`
 
-  const child = spawn('npx', ['@redocly/cli', 'preview', '-p', String(port)], {
+  const child = spawn('npx', ['-y','@redocly/cli', 'preview', '-p', String(port)], {
     cwd: openapiDir,
     stdio: 'inherit',
   })
