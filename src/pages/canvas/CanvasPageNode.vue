@@ -17,6 +17,7 @@ defineEmits<{
   headerMouseDown: [event: MouseEvent, pageId: string]
   toggleLines: [pageId: string]
   copyLink: [event: MouseEvent, page: PageNode]
+  resetFrame: [event: MouseEvent, page: PageNode]
   toggleDoc: [event: MouseEvent, pageId: string]
 }>()
 </script>
@@ -75,6 +76,20 @@ defineEmits<{
         </svg>
         <span>{{ page.name }}.vue</span>
       </div>
+      <button
+        class="page-reset-btn"
+        type="button"
+        :aria-label="`重置 ${page.name}.vue 到初始页面`"
+        title="重置"
+        @mousedown.stop
+        @dblclick.stop
+        @click="$emit('resetFrame', $event, page)"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M4 5v6h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5.1 11A8 8 0 1020 15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <button
         class="page-doc-btn"
         type="button"

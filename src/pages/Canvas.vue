@@ -448,6 +448,18 @@ const copyPageLink = async (e: MouseEvent, page: PageNode) => {
   }
 }
 
+const resetPageFrame = (e: MouseEvent, page: PageNode) => {
+  e.stopPropagation()
+  selectPage(page.id)
+  activeDocPageId.value = null
+  activeJumpLineKey.value = null
+
+  const iframe = document.getElementById(`iframe-${page.id}`) as HTMLIFrameElement | null
+  if (iframe) {
+    iframe.src = page.url
+  }
+}
+
 const onNodeHeaderMouseDown = (e: MouseEvent, pageId: string) => {
   e.stopPropagation()
   const page = pages.value.get(pageId)
@@ -755,6 +767,7 @@ const importLayout = (e: Event) => {
           @header-mouse-down="onNodeHeaderMouseDown"
           @toggle-lines="toggleRelatedLinesForPage"
           @copy-link="copyPageLink"
+          @reset-frame="resetPageFrame"
           @toggle-doc="togglePageDoc"
         />
 

@@ -313,7 +313,7 @@
 .page-header {
   position: relative;
   min-height: 42px;
-  padding: 0 76px;
+  padding: 0 106px 0 76px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   font-weight: 600;
@@ -394,12 +394,13 @@
   white-space: nowrap;
 }
 
+.page-reset-btn,
 .page-doc-btn {
   position: absolute;
   top: 8px;
-  right: 10px;
   width: 26px;
   height: 26px;
+  padding: 0;
   border: 1px solid #d1d5db;
   border-radius: 50%;
   background: white;
@@ -415,6 +416,15 @@
   transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
 }
 
+.page-reset-btn {
+  right: 42px;
+}
+
+.page-doc-btn {
+  right: 10px;
+}
+
+.page-reset-btn:hover,
 .page-doc-btn:hover,
 .page-doc-btn[aria-expanded='true'] {
   background: var(--color-primary);
@@ -422,6 +432,7 @@
   color: white;
 }
 
+.page-reset-btn:active,
 .page-doc-btn:active {
   transform: scale(0.96);
 }
