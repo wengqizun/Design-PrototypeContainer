@@ -10,7 +10,7 @@ PROTOTYPE_PAGES_DIR=xxx VITE_REDOCLY_CLI_SERVER=xxxx npm run dev
 - PROTOTYPE_PAGES_DIR：原型页面目录，用于指定原型项目的页面目录。
 - VITE_REDOCLY_CLI_SERVER：Redocly CLI服务器地址，
 
-`## 目录说明
+## 目录说明
 - `src/components`：用于存放可复用的VUE组件。
 - `src/styles`：用于存放可复用的样式和DesignToken。
 - `src/pages`：用于存放具体的VUE页面。
