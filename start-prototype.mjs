@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { existsSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import net from 'node:net'
 import path from 'node:path'
 
@@ -143,6 +143,40 @@ const findAvailablePort = async (startPort) => {
   return port
 }
 
+const readContainerConfig = (prototypeDir) => {
+  const configPath = path.join(prototypeDir, 'container.config')
+
+  if (!existsSync(configPath)) {
+    return {}
+  }
+
+  const config = {}
+  const lines = readFileSync(configPath, 'utf8').split(/\r?\n/)
+
+  for (const line of lines) {
+    const trimmedLine = line.trim()
+
+    if (!trimmedLine || trimmedLine.startsWith('#')) {
+      continue
+    }
+
+    const separatorIndex = trimmedLine.indexOf('=')
+
+    if (separatorIndex === -1) {
+      continue
+    }
+
+    const key = trimmedLine.slice(0, separatorIndex).trim()
+    const value = trimmedLine.slice(separatorIndex + 1).trim()
+
+    if (key) {
+      config[key] = value
+    }
+  }
+
+  return config
+}
+
 const startPrototype = (prototypeDir) => new Promise((resolve, reject) => {
   const child = spawn('npm', ['--prefix', prototypeDir, 'run', 'dev'], {
     stdio: ['inherit', 'pipe', 'pipe'],
@@ -200,13 +234,16 @@ const startOpenApi = async (openapiDir) => {
   return server
 }
 
-const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir, openApiServer }) => {
+const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir, openApiServer, designBase }) => {
+  const { VITE_DESIGN_BASE: ignoredDesignBase, ...containerEnv } = process.env
+
   const child = spawn('npm', ['--prefix', containerDir, 'run', 'dev'], {
     stdio: 'inherit',
     env: {
-      ...process.env,
+      ...containerEnv,
       VITE_PROTOTYPE_SERVER: prototypeOrigin,
       VITE_REDOCLY_CLI_SERVER: openApiServer || '',
+      ...(designBase ? { VITE_DESIGN_BASE: designBase } : {}),
       PROTOTYPE_PAGES_DIR: prototypePagesDir,
     },
   })
@@ -218,12 +255,13 @@ const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir, open
 try {
   const { containerDir, prototypeDir, openapiDir } = parseArgs(process.argv.slice(2))
   const prototypePagesDir = path.join(prototypeDir, 'src/pages')
+  const { VITE_DESIGN_BASE: designBase } = readContainerConfig(prototypeDir)
   let openApiServer = ''
   if (openapiDir) {
     openApiServer = await startOpenApi(openapiDir)
   }
   const prototypeOrigin = await startPrototype(prototypeDir)
-  startContainer({ containerDir, prototypeOrigin, prototypePagesDir, openApiServer })
+  startContainer({ containerDir, prototypeOrigin, prototypePagesDir, openApiServer, designBase })
 } catch (error) {
   console.error(error)
   shutdown(1)
