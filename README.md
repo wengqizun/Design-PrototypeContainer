@@ -3,12 +3,13 @@
 “容器项目”，负责画布、设备框、页面说明和跳转关系展示。
 
 ## 运行方式
-1. 只启动原型项目：
 ```bash
-PROTOTYPE_PAGES_DIR=xxx VITE_REDOCLY_CLI_SERVER=xxxx npm run dev
+PROTOTYPE_PAGES_DIR=xxx VITE_REDOCLY_CLI_SERVER=xxx VITE_PROTOTYPE_SERVER=xxx npm run dev
 ```
 - PROTOTYPE_PAGES_DIR：原型页面目录，用于指定原型项目的页面目录。
-- VITE_REDOCLY_CLI_SERVER：Redocly CLI服务器地址，
+- VITE_PROTOTYPE_SERVER：原型服务器地址。
+- VITE_REDOCLY_CLI_SERVER：Redocly CLI服务器地址。
+
 
 ## 目录说明
 - `src/components`：用于存放可复用的VUE组件。

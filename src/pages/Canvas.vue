@@ -127,7 +127,7 @@ const autoPositionPages = (pageMap: Map<string, PageNode>) => {
 const pageVersion = ref(Date.now())
 
 const buildPrototypeUrl = (path: string, version = pageVersion.value) => {
-  const url = new URL(path, import.meta.env.VITE_PROTOTYPE_ORIGIN)
+  const url = new URL(path, import.meta.env.VITE_PROTOTYPE_SERVER)
   if (version) {
     url.searchParams.set('_t', String(version))
   }

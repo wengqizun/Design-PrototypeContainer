@@ -64,7 +64,7 @@ const switchDevice = (device: DeviceName) => {
   }
 }
 
-const iframeSrc = new URL('/pages/index', import.meta.env.VITE_PROTOTYPE_ORIGIN).href
+const iframeSrc = new URL('/pages/index', import.meta.env.VITE_PROTOTYPE_SERVER).href
 
 const goBack = () => {
   router.push('/')

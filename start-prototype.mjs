@@ -205,7 +205,7 @@ const startContainer = ({ containerDir, prototypeOrigin, prototypePagesDir, open
     stdio: 'inherit',
     env: {
       ...process.env,
-      VITE_PROTOTYPE_ORIGIN: prototypeOrigin,
+      VITE_PROTOTYPE_SERVER: prototypeOrigin,
       VITE_REDOCLY_CLI_SERVER: openApiServer || '',
       PROTOTYPE_PAGES_DIR: prototypePagesDir,
     },
