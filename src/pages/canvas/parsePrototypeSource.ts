@@ -27,21 +27,57 @@ export const renderMarkdown = (markdown: string) => {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n')
   const html: string[] = []
   const paragraph: string[] = []
-  let listType: 'ul' | 'ol' | null = null
+  const listStack: Array<{ type: 'ul' | 'ol', indent: number, hasOpenItem: boolean }> = []
   let inCodeBlock = false
   let codeLines: string[] = []
 
-  const closeList = () => {
-    if (!listType) return
-    html.push(`</${listType}>`)
-    listType = null
+  const closeListItem = () => {
+    const currentList = listStack[listStack.length - 1]
+    if (!currentList?.hasOpenItem) return
+    html.push('</li>')
+    currentList.hasOpenItem = false
   }
 
-  const openList = (type: 'ul' | 'ol') => {
-    if (listType === type) return
-    closeList()
+  const openList = (type: 'ul' | 'ol', indent: number) => {
     html.push(`<${type}>`)
-    listType = type
+    listStack.push({ type, indent, hasOpenItem: false })
+  }
+
+  const closeList = () => {
+    const currentList = listStack.pop()
+    if (!currentList) return
+    if (currentList.hasOpenItem) {
+      html.push('</li>')
+    }
+    html.push(`</${currentList.type}>`)
+  }
+
+  const closeAllLists = () => {
+    while (listStack.length) {
+      closeList()
+    }
+  }
+
+  const getIndentWidth = (value: string) => value.replace(/\t/g, '    ').length
+
+  const openListItem = (type: 'ul' | 'ol', indent: number, content: string) => {
+    flushParagraph(paragraph, html)
+
+    while (listStack.length && indent < listStack[listStack.length - 1].indent) {
+      closeList()
+    }
+
+    if (!listStack.length || indent > listStack[listStack.length - 1].indent) {
+      openList(type, indent)
+    } else if (listStack[listStack.length - 1].type !== type) {
+      closeList()
+      openList(type, indent)
+    }
+
+    closeListItem()
+    const currentList = listStack[listStack.length - 1]
+    html.push(`<li>${renderInlineMarkdown(content)}`)
+    currentList.hasOpenItem = true
   }
 
   for (const line of lines) {
@@ -52,7 +88,7 @@ export const renderMarkdown = (markdown: string) => {
         inCodeBlock = false
       } else {
         flushParagraph(paragraph, html)
-        closeList()
+        closeAllLists()
         inCodeBlock = true
       }
       continue
@@ -65,14 +101,14 @@ export const renderMarkdown = (markdown: string) => {
 
     if (!line.trim()) {
       flushParagraph(paragraph, html)
-      closeList()
+      closeAllLists()
       continue
     }
 
     const heading = line.match(/^(#{1,6})\s+(.+)$/)
     if (heading) {
       flushParagraph(paragraph, html)
-      closeList()
+      closeAllLists()
       const level = heading[1].length
       html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`)
       continue
@@ -81,28 +117,24 @@ export const renderMarkdown = (markdown: string) => {
     const quote = line.match(/^>\s?(.+)$/)
     if (quote) {
       flushParagraph(paragraph, html)
-      closeList()
+      closeAllLists()
       html.push(`<blockquote>${renderInlineMarkdown(quote[1])}</blockquote>`)
       continue
     }
 
-    const unordered = line.match(/^\s*[-*]\s+(.+)$/)
+    const unordered = line.match(/^(\s*)[-*]\s+(.+)$/)
     if (unordered) {
-      flushParagraph(paragraph, html)
-      openList('ul')
-      html.push(`<li>${renderInlineMarkdown(unordered[1])}</li>`)
+      openListItem('ul', getIndentWidth(unordered[1]), unordered[2])
       continue
     }
 
-    const ordered = line.match(/^\s*\d+\.\s+(.+)$/)
+    const ordered = line.match(/^(\s*)\d+\.\s+(.+)$/)
     if (ordered) {
-      flushParagraph(paragraph, html)
-      openList('ol')
-      html.push(`<li>${renderInlineMarkdown(ordered[1])}</li>`)
+      openListItem('ol', getIndentWidth(ordered[1]), ordered[2])
       continue
     }
 
-    closeList()
+    closeAllLists()
     paragraph.push(line.trim())
   }
 
@@ -110,7 +142,7 @@ export const renderMarkdown = (markdown: string) => {
     html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`)
   }
   flushParagraph(paragraph, html)
-  closeList()
+  closeAllLists()
 
   return html.join('')
 }
