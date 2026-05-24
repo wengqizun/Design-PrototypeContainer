@@ -122,7 +122,7 @@ const watchChildExit = (child) => {
 process.on('SIGINT', () => shutdown(0))
 process.on('SIGTERM', () => shutdown(0))
 
-const isPortAvailable = (port, host = OPENAPI_HOST) => new Promise((resolve) => {
+const isPortAvailable = (port) => new Promise((resolve) => {
   const server = net.createServer()
 
   server.once('error', () => resolve(false))
@@ -130,7 +130,7 @@ const isPortAvailable = (port, host = OPENAPI_HOST) => new Promise((resolve) => 
     server.close(() => resolve(true))
   })
 
-  server.listen(port, host)
+  server.listen(port)
 })
 
 const findAvailablePort = async (startPort) => {
