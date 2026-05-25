@@ -128,6 +128,7 @@ const pageVersion = ref(Date.now())
 
 const buildPrototypeUrl = (path: string, version = pageVersion.value) => {
   const url = new URL(path, import.meta.env.VITE_PROTOTYPE_SERVER)
+  url.searchParams.set('__lockPath', path)
   if (version) {
     url.searchParams.set('_t', String(version))
   }
