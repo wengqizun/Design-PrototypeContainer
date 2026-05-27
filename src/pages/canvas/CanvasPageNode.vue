@@ -18,6 +18,7 @@ defineEmits<{
   toggleLines: [pageId: string]
   copyLink: [event: MouseEvent, page: PageNode]
   resetFrame: [event: MouseEvent, page: PageNode]
+  noticeStateChange: [event: MouseEvent, page: PageNode]
   toggleDoc: [event: MouseEvent, pageId: string]
 }>()
 </script>
@@ -25,7 +26,11 @@ defineEmits<{
 <template>
   <div
     class="page-wrapper"
-    :class="{ 'is-dragging': draggingNodeId === id, 'is-selected': selectedPageId === id }"
+    :class="{
+      'is-dragging': draggingNodeId === id,
+      'is-selected': selectedPageId === id,
+      'has-state-control': page.hasPageStateNotice,
+    }"
     :style="{ left: `${page.x}px`, top: `${page.y}px`, width: `${page.width}px`, height: `${page.height}px` }"
     @mousedown="$emit('select', id)"
     @dblclick="$emit('doubleClick', page)"
@@ -76,6 +81,23 @@ defineEmits<{
         </svg>
         <span>{{ page.name }}.vue</span>
       </div>
+      <button
+        v-if="page.hasPageStateNotice"
+        class="page-state-btn"
+        type="button"
+        :aria-label="`查看 ${page.name}.vue 的不同状态`"
+        title="查看不同状态"
+        @mousedown.stop
+        @dblclick.stop
+        @click="$emit('noticeStateChange', $event, page)"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M4 7h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M4 17h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="9" cy="7" r="3" fill="white" stroke="currentColor" stroke-width="2"/>
+          <circle cx="15" cy="17" r="3" fill="white" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
       <button
         class="page-reset-btn"
         type="button"

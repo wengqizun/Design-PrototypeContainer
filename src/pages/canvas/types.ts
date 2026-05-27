@@ -5,6 +5,7 @@ export interface PageNode {
   doc: string
   docHtml: string
   apis: PageApi[]
+  hasPageStateNotice: boolean
   x: number
   y: number
   width: number

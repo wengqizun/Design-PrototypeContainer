@@ -20,6 +20,7 @@ import {
 import type { DrawnLine, Edge, JumpMarker, PageApi, PageNode } from './canvas/types'
 
 const router = useRouter()
+const PAGE_STATE_NOTICE_MESSAGE = '@@wqz-notice-change-page-state@@'
 
 const pages = ref<Map<string, PageNode>>(new Map())
 const edges = ref<Edge[]>([])
@@ -196,6 +197,7 @@ const loadPages = async () => {
       doc,
       docHtml: renderMarkdown(doc),
       apis,
+      hasPageStateNotice: rawContent.includes(PAGE_STATE_NOTICE_MESSAGE),
       x: 0,
       y: 0,
       width: pageSize.width,
@@ -459,6 +461,14 @@ const resetPageFrame = (e: MouseEvent, page: PageNode) => {
   if (iframe) {
     iframe.src = page.url
   }
+}
+
+const noticePageStateChange = (e: MouseEvent, page: PageNode) => {
+  e.stopPropagation()
+  selectPage(page.id)
+
+  const iframe = document.getElementById(`iframe-${page.id}`) as HTMLIFrameElement | null
+  iframe?.contentWindow?.postMessage({ type: PAGE_STATE_NOTICE_MESSAGE }, '*')
 }
 
 const onNodeHeaderMouseDown = (e: MouseEvent, pageId: string) => {
@@ -769,6 +779,7 @@ const importLayout = (e: Event) => {
           @toggle-lines="toggleRelatedLinesForPage"
           @copy-link="copyPageLink"
           @reset-frame="resetPageFrame"
+          @notice-state-change="noticePageStateChange"
           @toggle-doc="togglePageDoc"
         />
 

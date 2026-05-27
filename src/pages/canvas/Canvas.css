@@ -325,6 +325,10 @@
   justify-content: center;
 }
 
+.page-wrapper.has-state-control .page-header {
+  padding-right: 138px;
+}
+
 .page-line-btn,
 .page-copy-link-btn {
   position: absolute;
@@ -394,6 +398,26 @@
   white-space: nowrap;
 }
 
+.page-state-btn {
+  position: absolute;
+  top: 8px;
+  right: 74px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  background: white;
+  color: #374151;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+}
+
 .page-reset-btn,
 .page-doc-btn {
   position: absolute;
@@ -424,6 +448,7 @@
   right: 10px;
 }
 
+.page-state-btn:hover,
 .page-reset-btn:hover,
 .page-doc-btn:hover,
 .page-doc-btn[aria-expanded='true'] {
@@ -432,6 +457,7 @@
   color: white;
 }
 
+.page-state-btn:active,
 .page-reset-btn:active,
 .page-doc-btn:active {
   transform: scale(0.96);
