@@ -108,8 +108,7 @@ defineEmits<{
         @click="$emit('resetFrame', $event, page)"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M4 5v6h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M5.1 11A8 8 0 1020 15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
       <button
